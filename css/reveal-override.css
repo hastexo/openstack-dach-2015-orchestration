@@ -1,6 +1,7 @@
 @import url(//fonts.googleapis.com/css?family=Cabin:400,700);
 @import url(//fonts.googleapis.com/css?family=Special+Elite:400,700);
 @import url(//fonts.googleapis.com/css?family=Shadows+Into+Light:400,700);
+@import url(//fonts.googleapis.com/css?family=Source+Code+Pro);
 
 /* Disable background 4px border around images */
 .reveal section img {
@@ -21,7 +22,7 @@
 /* Blow iframe up to full screen size */
 .reveal iframe
 {
-  height: 80%;
+  height: 90%;
   width: 100%;
   margin: 2%;
 }
@@ -92,13 +93,8 @@ body,
 }
 
 
-/* Override the default uppercase text-transform
-   for h2-h6 (but retain for h1) */
-.reveal h2,
-.reveal h3,
-.reveal h4,
-.reveal h5,
-.reveal h6 {
+.reveal a {
+    font-family: "Special Elite", monospace !important;
 }
 
 .reveal code {
@@ -109,8 +105,8 @@ body,
 }
 
 .reveal pre code {
-    font-family: "Courier New", monospace !important;
-    color: #DCDCDC !important;
+    font-family: "Source Code Pro", monospace !important;
+    background: inherit !important;
     text-shadow: none;
     text-transform: none;
 }

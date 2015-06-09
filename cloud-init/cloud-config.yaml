@@ -1,0 +1,40 @@
+#cloud-config
+
+package_update: true
+package_upgrade: true
+
+users:
+- default
+- name: foobar
+  gecos: "Fred Otto Oscar Bar"
+  groups: users,adm
+  lock-passwd: false
+  passwd: '$6$WP9924IJiLSto8Ng$MSDwCvlT28jMOr9dwPUcJjQzcoB0BV0WCMMPB9xCj1ogbGlvgGOH.dHy5NnqYYqHVkvD5Wca/K4W.qUBbQei61' 
+  shell: /bin/bash
+  sudo: "ALL=(ALL) NOPASSWD:ALL"
+
+ssh_pwauth: true
+
+write_files:
+- path: /etc/hosts
+  permissions: '0644'
+  content: |
+    127.0.0.1 localhost
+    ::1       ip6-localhost ip6-loopback
+    fe00::0   ip6-localnet
+    ff00::0   ip6-mcastprefix
+    ff02::1   ip6-allnodes
+    ff02::2   ip6-allrouters
+
+    192.168.122.100 deploy.example.com deploy
+    192.168.122.111 alice.example.com alice
+    192.168.122.112 bob.example.com bob
+    192.168.122.113 charlie.example.com charlie
+
+packages:
+  - ansible
+  - git
+
+runcmd:
+  - echo "hello world"
+  - date

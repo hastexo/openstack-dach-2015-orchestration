@@ -2,6 +2,17 @@ Nova
 ## user data
 
 
+```sh
+nova boot \
+  --image trusty-server-cloudimg-amd64 \
+  --key_name mykey \
+  --flavor m1.small \
+  --user-data userdata.txt \
+  --nic net-id=4f0dcc21-4b6c-47db-b283-591fdb9aa5a7 \
+  test0
+```
+
+
 # This
 is what user-data
 ## typically
@@ -56,8 +67,21 @@ What can we
 with `cloud-config`?
 
 
+### `package_update`
+### `package_upgrade`
+Update system on first boot
+
+
+```yaml
+#cloud-config
+
+package_update: true
+package_upgrade: true
+```
+
+
 # `users`
-Configures users and groups
+Configure users and groups
 
 
 ```yaml
@@ -73,18 +97,17 @@ users:
 ```
 
 
-# `bootcmd`
-Runs arbitrary commands early in the boot sequence
+## `ssh_pwauth`
+Enable/disable SSH password authentication
 
 
-```yaml
-bootcmd:
-- ntpdate pool.ntp.org
+```
+ssh_pwauth: true
 ```
 
 
 ## `write_files`
-Writes arbitrary files
+Write arbitrary files
 
 
 ```yaml
@@ -106,19 +129,8 @@ write_files:
 ```
 
 
-### `package_update`
-### `package_upgrade`
-Update system on first boot
-
-
-```yaml
-package_update: true
-package_upgrade: true
-```
-
-
 # `puppet`
-Configures a VM's Puppet agent
+Configure a VM's Puppet agent
 
 
 ```yaml
@@ -141,7 +153,7 @@ puppet:
 
 
 # `chef`
-Configures a VM's Chef client
+Configure a VM's Chef client
 
 
 ```yaml
@@ -168,7 +180,7 @@ chef:
 
 
 # `packages`
-Installs packages
+Install packages
 
 
 ```yaml
@@ -178,8 +190,22 @@ packages:
 ```
 
 
+Running
+## arbitrary commands
+
+
+# `bootcmd`
+Run commands early in the boot sequence
+
+
+```yaml
+bootcmd:
+- ntpdate pool.ntp.org
+```
+
+
 # `runcmd`
-Runs arbitrary commands late in the boot sequence
+Run commands late in the boot sequence
 
 
 ```yaml

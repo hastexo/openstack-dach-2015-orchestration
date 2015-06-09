@@ -32,15 +32,15 @@ with Heat?
 Configures Nova guests
 
 
-```yaml
+```
 resources:
-  my_box:
-    type: OS::Nova::Server
+  mybox:
+    type: "OS::Nova::Server"
     properties:
-      name: my_box
+      name: mybox
       image: trusty-server-cloudimg-amd64
-      flavor: m1.tiny
-      key_name: my_key
+      flavor: m1.small
+      key_name: mykey
 ```
 
 
@@ -49,7 +49,9 @@ Now we could just
 this stack
 
 
-### `heat stack-create -f stack.yml`
+```sh
+heat stack-create -f stack.yml mystack
+```
 
 
 But as it is,
@@ -62,7 +64,7 @@ Let's add some
 ## parameters
 
 
-```yaml
+```
 parameters:
   flavor:
     type: string
@@ -82,14 +84,15 @@ And some
 ## intrinsic functions
 
 
-```yaml
+```
 resources:
-  my_box:
-    type: OS::Nova::Server
+  mybox:
+    type: "OS::Nova::Server"
     properties:
-      name: my_box
+      name: mybox
       image: { get_param: image }
       flavor: { get_param: flavor }
+      key_name: { get_param: key_name }
 ```
 
 
@@ -99,9 +102,10 @@ these parameters
 
 
 ```sh
-heat stack-create -f stack.yml` \
+heat stack-create -f stack.yml \
   -P key_name=mykey
-  -P image=cirros-0.3.3-x86_64
+  -P image=cirros-0.3.3-x86_64 \
+  mystack
 ```
 
 
@@ -115,23 +119,23 @@ Wouldn't that be nice?
 Defines Neutron networks
 
 
-```yaml
-  my_net:
-    type: OS::Neutron::Net
+```
+  mynet:
+    type: "OS::Neutron::Net"
     properties:
       name: management-net
 
-  my_sub_net:
-    type: OS::Neutron::Subnet
+  mysub_net:
+    type: "OS::Neutron::Subnet"
     properties:
       name: management-sub-net
-      network_id: { get_resource: management_net }
+      network: { get_resource: management_net }
       cidr: 192.168.122.0/24
-      gateway_ip: 192.168.122.1
+      gateway_ip: 192.168.101.1
       enable_dhcp: true
       allocation_pools: 
-        - start: "192.168.122.2"
-          end: "192.168.122.50"
+        - start: "192.168.101.2"
+          end: "192.168.101.50"
 ```
 
 
@@ -147,11 +151,11 @@ Automatic dependency
 Configures Neutron routers
 
 
-```yaml
+```
 parameters:
-  public_net_id:
+  public_net:
     type: string
-    description: Public network ID
+    description: Public network ID or name
 
 resources:
   router:
@@ -159,13 +163,13 @@ resources:
   router_gateway:
     type: OS::Neutron::RouterGateway
     properties:
-      router_id: { get_resource: router }
-      network_id: { get_param: public_net_id }
+      router: { get_resource: router }
+      network: { get_param: public_net }
   router_interface:
     type: OS::Neutron::RouterInterface
     properties:
-      router_id: { get_resource: router }
-      subnet_id: { get_resource: my_sub_net }
+      router: { get_resource: router }
+      subnet: { get_resource: mysub_net }
 ```
 
 
@@ -173,16 +177,16 @@ resources:
 Configures Neutron ports
 
 
-```yaml
+```
   mybox_management_port:
-    type: OS::Neutron::Port
+    type: "OS::Neutron::Port"
     properties:
-      network_id: { get_resource: my_net }
+      network: { get_resource: mynet }
 ```
 
-```yaml
-  my_box:
-    type: OS::Nova::Server
+```
+  mybox:
+    type: "OS::Nova::Server"
     properties:
       name: deploy
       image: { get_param: image }
@@ -197,13 +201,30 @@ Configures Neutron ports
 Allocates floating IP addresses
 
 
-
-```yaml
-  my_floating_ip:
-    type: OS::Neutron::FloatingIP
+```
+  myfloating_ip:
+    type: "OS::Neutron::FloatingIP"
     properties:
-      floating_network_id: { get_param: public_net_id }
-      port_id: { get_resource: mybox_management_port }
+      floating_network: { get_param: public_net }
+      port: { get_resource: mybox_management_port }
+```
+
+
+### `outputs`
+Return stack values or attributes
+
+
+```
+outputs:
+  public_ip:
+    description: Floating IP address in public network
+    value: { get_attr: [ myfloating_ip, floating_ip_address ] }
+```
+
+
+```sh
+heat output-show \
+  mystack public_ip
 ```
 
 
@@ -213,9 +234,9 @@ with
 ## `cloud-init`
 
 
-```yaml
-  my_box:
-    type: OS::Nova::Server
+```
+  mybox:
+    type: "OS::Nova::Server"
     properties:
       name: deploy
       image: { get_param: image }
@@ -232,9 +253,9 @@ with
 Manages `cloud-config` directly from Heat
 
 
-```yaml
+```
 resources:
-  my_config:
+  myconfig:
     type: "OS::Heat::CloudConfig"
     properties:
       cloud_config:
@@ -242,9 +263,9 @@ resources:
         package_upgrade: true
 ```
 
-```yaml
-  my_box:
-    type: OS::Nova::Server
+```
+  mybox:
+    type: "OS::Nova::Server"
     properties:
       name: deploy
       image: { get_param: image }
@@ -252,7 +273,7 @@ resources:
       key_name: { get_param: key_name }
       networks:
         - port: { get_resource: mybox_management_port }
-      user_data: { get_resource: my_config }
+      user_data: { get_resource: myconfig }
       user_data_format: RAW
 ```
 
