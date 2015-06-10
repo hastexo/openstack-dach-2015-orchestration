@@ -197,6 +197,36 @@ Configures Neutron ports
 ```
 
 
+### `OS::Neutron::SecurityGroup`
+Configures Neutron security groups
+
+
+```
+  mysecurity_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      description: Neutron security group rules
+      name: mysecurity_group
+      rules:
+      - remote_ip_prefix: 0.0.0.0/0
+        protocol: tcp
+        port_range_min: 22
+        port_range_max: 22
+      - remote_ip_prefix: 0.0.0.0/0
+        protocol: icmp
+        direction: ingress
+```
+
+```
+  mybox_management_port:
+    type: "OS::Neutron::Port"
+    properties:
+      network: { get_resource: mynet }
+      security_groups:
+        - { get_resource: mysecurity_group }
+```
+
+
 ### `OS::Neutron::FloatingIP`
 Allocates floating IP addresses
 
@@ -277,3 +307,41 @@ resources:
       user_data_format: RAW
 ```
 
+
+Now we can also
+# set
+### `cloud-config` parameters
+directly from Heat
+
+
+```
+parameters:
+  # [...]
+  username:
+    type: string
+    description: Additional login username
+    default: foobar
+  gecos:
+    type: string
+    description: Additional user full name
+    default: ''
+```
+
+```
+  myconfig:
+    type: "OS::Heat::CloudConfig"
+    properties:
+      cloud_config:
+        package_update: true
+        package_upgrade: true
+        users:
+        - default
+        - name: { get_param: username }
+          gecos: { get_param: gecos }
+          groups: "users,adm"
+          lock-passwd: false
+          passwd: '$6$WP9924IJiLSto8Ng$MSDwCvlT28jM'
+          shell: "/bin/bash"
+          sudo: "ALL=(ALL) NOPASSWD:ALL"
+        ssh_pwauth: true
+```
