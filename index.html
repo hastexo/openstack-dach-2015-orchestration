@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="highlight.js/src/styles/googlecode.css" />
 
     <!-- For JavaScript-generated QR codes -->
-    <!--link rel="stylesheet" href="css/qrcode.css" /-->
+    <link rel="stylesheet" href="css/qrcode.css"/>
 
     <!-- If the query includes 'print-pdf', use the PDF print sheet -->
     <script>
@@ -26,6 +26,11 @@
   <body>
     <div class="reveal">
       <div class="slides">
+        <section>
+	  <div class="qrcode" id="qrcode-talk"/>
+	  <p><a href="http://goo.gl/W1Lnrp" target="_blank"
+		id="talk">http://hastexo.github.io/openstack-dach-2015-orchestration</a></p>
+        </section>
         <section id="intro"
                  data-markdown="markdown/intro.md"
                  data-separator="^\n\n\n"
@@ -76,13 +81,13 @@ Reveal.initialize({
 
     // Optional libraries used to extend on reveal.js
     dependencies: [
-	{ src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
-	{ src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-	{ src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-	{ src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
-	{ src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
-	{ src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
-	{ src: '//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.10/socket.io.min.js', async: true },
+        { src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+        { src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+        { src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+        { src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+        { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+        { src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } },
+        { src: '//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.10/socket.io.min.js', async: true },
     ]
 });
     </script>
@@ -96,6 +101,33 @@ Reveal.initialize({
     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
   })();
+    </script>
+    <script src="qrcodejs/qrcode.js"></script>
+    <script type="text/javascript">
+      Reveal.addEventListener('ready', function() {
+/* Grab all links and iterate over them */
+var sources = document.getElementsByTagName('a');
+n = sources.length;
+for (var i = 0; i < n; i++) {
+    var source = sources[i];
+    var href = source.href;
+
+    /* If the link has no href attribute, skip it */
+    if (href) {
+        var target_id = "qrcode-" + source.id ;
+        var target = document.getElementById(target_id);
+        /* If the source has no corresponding target element, skip
+         * it */
+        if (target) {
+            var qr = new QRCode(target, {
+                colorDark : "#000000",
+                colorLight : "rgba(255,255,255,0)",
+            });
+            qr.makeCode(href);
+        }
+    }
+}
+})
     </script>
   </body>
 </html>

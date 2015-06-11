@@ -28,7 +28,7 @@ What can we
 with Heat?
 
 
-## `OS::Nova::Server`
+### `OS::Nova::Server`
 Configures Nova guests
 
 
