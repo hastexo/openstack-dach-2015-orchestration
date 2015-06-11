@@ -1,6 +1,3 @@
-http://hastexo.github.io/openstack-dach-2015-orchestration
-
-
 OpenStack
 ## Orchestration
 and
